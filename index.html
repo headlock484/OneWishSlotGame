@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a0a2e" />
+  <title>If I had just 1 wish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg-deep: #0d0618;
+      --bg-mid: #1a0a2e;
+      --gold: #e8c547;
+      --magenta: #c44cff;
+      --cyan: #5ce1ff;
+      --font-title: "Cinzel", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      --font-subtitle: "Source Sans 3", system-ui, "Segoe UI", sans-serif;
+      --swirl-duration: 2.4s;
+      --hold-duration: 2.8s;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      min-height: 100dvh;
+      min-height: 100svh;
+      background: radial-gradient(ellipse 120% 80% at 50% 100%, #2d1b4e 0%, var(--bg-deep) 55%);
+      color: #f5f0ff;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    html {
+      overflow-y: auto;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .stage {
+      min-height: 100dvh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.75rem, 3vw, 1.25rem);
+      padding: max(0.75rem, env(safe-area-inset-top)) 1rem calc(1.25rem + var(--safe-bottom));
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    .title-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      max-width: min(92vw, 24rem);
+    }
+
+    .reel-header {
+      position: relative;
+      width: 100%;
+      flex-shrink: 0;
+      z-index: 1;
+      padding: clamp(0.5rem, 2.2vw, 0.95rem) 0.55rem clamp(0.35rem, 1.8vw, 0.6rem);
+      pointer-events: none;
+      text-align: center;
+      background: linear-gradient(
+        to bottom,
+        rgba(6, 3, 14, 0.45) 0%,
+        transparent 100%
+      );
+    }
+
+    .reel-header .title-stack {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .reel-header .game-heading {
+      max-width: 24ch;
+    }
+
+    /* Slides 1–2: only main title; slide 3 also shows & + tagline (header sits above reel) */
+    .stage:not(.show-big-win) .title-ampersand,
+    .stage:not(.show-big-win) .game-tagline {
+      display: none;
+    }
+
+    /* Final slide: title block above the slot frame */
+    .stage.show-big-win .reel-header {
+      padding-top: clamp(0.15rem, 1vw, 0.35rem);
+      padding-bottom: clamp(0.35rem, 1.6vw, 0.55rem);
+      background: linear-gradient(
+        to bottom,
+        rgba(6, 3, 14, 0.55) 0%,
+        rgba(6, 3, 14, 0.12) 70%,
+        transparent 100%
+      );
+    }
+
+    .stage.show-big-win .reel-header .title-stack {
+      gap: clamp(0.22rem, 1vw, 0.38rem);
+      transform: none;
+    }
+
+    .stage.show-big-win .game-tagline {
+      animation: none;
+      max-width: min(96%, 26rem);
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 0.4rem;
+      font-size: clamp(1.17rem, 4.125vw, 1.41rem);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      line-height: 1.25;
+      text-shadow:
+        0 0 2px rgba(0, 0, 0, 0.95),
+        0 1px 3px rgba(0, 0, 0, 0.92),
+        0 0 8px rgba(196, 76, 255, 0.75),
+        0 0 16px rgba(92, 225, 255, 0.4),
+        0 0 24px rgba(196, 76, 255, 0.35);
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    .stage.show-big-win .reel-stack:has(.reel-window.jackpot-art-ready) .game-tagline {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .title-ampersand {
+      display: block;
+      text-align: center;
+      font-family: var(--font-title);
+      font-size: clamp(1.05rem, 3.8vw, 1.45rem);
+      font-weight: 600;
+      line-height: 1;
+      margin: 0.12rem 0;
+      color: #f0d4ff;
+      letter-spacing: 0.14em;
+      text-shadow:
+        0 0 4px #fff,
+        0 0 10px var(--magenta),
+        0 0 20px var(--magenta),
+        0 0 36px rgba(196, 76, 255, 0.9),
+        0 0 56px rgba(196, 76, 255, 0.55),
+        0 0 80px rgba(147, 51, 234, 0.35);
+      filter: drop-shadow(0 0 8px rgba(196, 76, 255, 0.65));
+    }
+
+    .game-heading {
+      margin: 0;
+      max-width: 22ch;
+      text-align: center;
+      font-family: var(--font-title);
+      font-size: clamp(1.22rem, 4.8vw, 1.68rem);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      line-height: 1.22;
+      color: #e8fbff;
+      text-shadow:
+        0 0 4px #fff,
+        0 0 10px var(--cyan),
+        0 0 22px var(--cyan),
+        0 0 38px rgba(92, 225, 255, 0.9),
+        0 0 58px rgba(92, 225, 255, 0.5),
+        0 0 82px rgba(92, 225, 255, 0.28),
+        0 0 48px rgba(196, 76, 255, 0.22);
+      filter: drop-shadow(0 0 10px rgba(92, 225, 255, 0.55));
+    }
+
+    .game-tagline {
+      margin: 0;
+      text-align: center;
+      font-family: var(--font-subtitle);
+      font-size: clamp(0.88rem, 3.2vw, 1.02rem);
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      line-height: 1.4;
+      color: #ebe4f5;
+      text-shadow:
+        0 0 4px #fff,
+        0 0 10px var(--magenta),
+        0 0 20px var(--magenta),
+        0 0 36px rgba(196, 76, 255, 0.88),
+        0 0 54px rgba(147, 51, 234, 0.45),
+        0 0 28px rgba(92, 225, 255, 0.35);
+      filter: drop-shadow(0 0 8px rgba(196, 76, 255, 0.5));
+      animation: taglineIn 0.65s ease 0.2s both;
+    }
+
+    @keyframes taglineIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Slot frame + HUD row below (same width as the game) */
+    .reel-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: min(92vw, 420px);
+      flex-shrink: 0;
+      max-width: 100%;
+      gap: clamp(0.2rem, 1.4vw, 0.5rem);
+    }
+
+    .reel-window {
+      position: relative;
+      width: 100%;
+      flex-shrink: 0;
+      /* ~30% taller than 3:4 (same width → height ×1.3): was 3/4, now 3/(4×1.3) → 15/26 */
+      aspect-ratio: 15 / 26;
+      max-height: min(94dvh, 94svh, 728px);
+      border-radius: clamp(12px, 4vw, 20px);
+      overflow: hidden;
+      box-shadow:
+        0 0 0 2px rgba(232, 197, 71, 0.35),
+        0 0 40px rgba(196, 76, 255, 0.25),
+        inset 0 0 60px rgba(0, 0, 0, 0.5);
+      background: #0a0514;
+    }
+
+    .reel-window::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 4;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.65);
+    }
+
+    /* BIG WIN overlay — bottom of reel only (HUD lives under the frame) */
+    .reel-chrome {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: stretch;
+      padding: 0 0.45rem clamp(0.55rem, 3.5vw, 1rem);
+      pointer-events: none;
+      background: linear-gradient(
+        to top,
+        rgba(6, 3, 14, 0.55) 0%,
+        rgba(6, 3, 14, 0.22) 55%,
+        transparent 100%
+      );
+    }
+
+    /* Balance (top) + Bet (bottom) on the left; Winnings center; Pot spin on the right */
+    .slot-hud {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr) minmax(0, 1.05fr);
+      align-items: end;
+      gap: clamp(0.2rem, 2.5vw, 0.55rem);
+      width: 100%;
+      padding: 0 1.5% 0.15rem;
+      pointer-events: none;
+    }
+
+    .slot-hud-below {
+      flex-shrink: 0;
+      padding: clamp(0.4rem, 2vw, 0.65rem) clamp(0.35rem, 2.2vw, 0.75rem) clamp(0.15rem, 1vw, 0.35rem);
+      margin: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 0 0 clamp(11px, 3.2vw, 16px) clamp(11px, 3.2vw, 16px);
+      background: rgba(245, 248, 255, 0.06);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .slot-hud-below .hud-readout {
+      background: rgba(8, 4, 18, 0.5);
+      border-color: rgba(232, 197, 71, 0.35);
+    }
+
+    .hud-left {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.12rem, 1.2vw, 0.28rem);
+      justify-self: start;
+      min-width: 0;
+    }
+
+    .hud-center {
+      justify-self: center;
+      align-self: end;
+      min-width: 0;
+    }
+
+    .hud-spin-wrap {
+      justify-self: end;
+      align-self: end;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: clamp(0.15rem, 1.1vw, 0.3rem);
+      pointer-events: auto;
+    }
+
+    .hud-replay-hint {
+      display: none;
+      font-family: var(--font-subtitle);
+      font-size: clamp(0.54rem, 1.85vw, 0.68rem);
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.2;
+      color: rgba(232, 197, 71, 0.88);
+      text-shadow:
+        0 0 8px rgba(196, 76, 255, 0.4),
+        0 1px 2px rgba(0, 0, 0, 0.65);
+      max-width: 6rem;
+    }
+
+    .stage.show-big-win .hud-replay-hint {
+      display: block;
+    }
+
+    .hud-readout {
+      display: flex;
+      flex-direction: column;
+      gap: 0.06rem;
+      padding: 0.2rem 0.38rem 0.22rem;
+      min-width: 0;
+      max-width: 100%;
+      border-radius: 6px;
+      background: rgba(8, 4, 18, 0.42);
+      border: 1px solid rgba(232, 197, 71, 0.28);
+      box-shadow:
+        0 0 12px rgba(196, 76, 255, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(4px);
+    }
+
+    .hud-label {
+      font-size: clamp(0.52rem, 1.85vw, 0.65rem);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(232, 197, 71, 0.75);
+      text-shadow: 0 0 8px rgba(196, 76, 255, 0.35);
+    }
+
+    .hud-value {
+      font-size: clamp(0.78rem, 3.1vw, 0.98rem);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+      color: #fffcef;
+      text-shadow:
+        0 0 10px rgba(92, 225, 255, 0.45),
+        0 0 18px rgba(196, 76, 255, 0.25);
+    }
+
+    .hud-winnings .hud-value {
+      font-size: clamp(0.82rem, 3.4vw, 1.05rem);
+      color: #e8fbff;
+    }
+
+    .hud-winnings.is-counting .hud-value {
+      color: #fffef5;
+      text-shadow:
+        0 0 12px rgba(232, 197, 71, 0.65),
+        0 0 24px rgba(196, 76, 255, 0.5);
+    }
+
+    /* Pot area = spin control: clear center so slot art shows through; orbit ring themed */
+    .pot-spin-btn {
+      position: relative;
+      flex-shrink: 0;
+      width: clamp(3rem, 15.5vw, 4.35rem);
+      height: clamp(3rem, 15.5vw, 4.35rem);
+      min-width: 48px;
+      min-height: 48px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: radial-gradient(
+        circle at 50% 45%,
+        rgba(26, 15, 46, 0.08) 0%,
+        rgba(8, 4, 18, 0.12) 55%,
+        transparent 72%
+      );
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Mini version of the reel swirl: vortex + spiral threads + counter‑rotating rings */
+    .pot-spin-btn .pot-spin-mini {
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .pot-spin-vortex {
+      position: absolute;
+      inset: -32%;
+      z-index: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(92, 225, 255, 0.2) 42deg,
+        transparent 78deg,
+        rgba(196, 76, 255, 0.26) 118deg,
+        transparent 158deg,
+        rgba(232, 197, 71, 0.22) 198deg,
+        transparent 238deg,
+        rgba(196, 76, 255, 0.14) 278deg,
+        transparent 318deg,
+        rgba(92, 225, 255, 0.16) 360deg
+      );
+      animation: potMiniVortex 1.2s linear infinite;
+    }
+
+    .pot-spin-spiral {
+      position: absolute;
+      z-index: 1;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .pot-spin-spiral-1 {
+      inset: -12%;
+      background: repeating-conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0deg 11deg,
+        rgba(232, 197, 71, 0.32) 11deg 12deg,
+        transparent 12deg 24deg,
+        rgba(92, 225, 255, 0.22) 24deg 25deg,
+        transparent 25deg 36deg,
+        rgba(196, 76, 255, 0.26) 36deg 37deg,
+        transparent 37deg 360deg
+      );
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 20%, black 44%, transparent 74%);
+      mask-image: radial-gradient(circle at 50% 50%, transparent 20%, black 44%, transparent 74%);
+      animation: potMiniSpiral 2.2s linear infinite;
+      opacity: 0.88;
+    }
+
+    .pot-spin-spiral-2 {
+      inset: -8%;
+      background: repeating-conic-gradient(
+        from 38deg at 50% 50%,
+        transparent 0deg 9deg,
+        rgba(196, 76, 255, 0.3) 9deg 10deg,
+        transparent 10deg 21deg,
+        rgba(232, 197, 71, 0.22) 21deg 22deg,
+        transparent 22deg 360deg
+      );
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 28%, black 54%, transparent 84%);
+      mask-image: radial-gradient(circle at 50% 50%, transparent 28%, black 54%, transparent 84%);
+      animation: potMiniSpiralRev 3s linear infinite;
+      opacity: 0.62;
+    }
+
+    .pot-spin-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 2;
+      border-radius: 50%;
+      box-sizing: border-box;
+      border: 2px solid transparent;
+      border-top-color: var(--gold);
+      border-right-color: rgba(92, 225, 255, 0.62);
+      border-bottom-color: rgba(196, 76, 255, 0.48);
+      border-left-color: rgba(232, 197, 71, 0.26);
+      box-shadow:
+        0 0 10px rgba(196, 76, 255, 0.38),
+        inset 0 0 10px rgba(92, 225, 255, 0.12);
+    }
+
+    .pot-spin-r1 {
+      width: 62%;
+      height: 62%;
+      animation: potMiniRing 1.85s linear infinite;
+    }
+
+    .pot-spin-r2 {
+      width: 88%;
+      height: 88%;
+      border-width: 1px;
+      opacity: 0.52;
+      animation: potMiniRingRev 2.65s linear infinite;
+      box-shadow:
+        0 0 12px rgba(92, 225, 255, 0.28),
+        inset 0 0 10px rgba(196, 76, 255, 0.1);
+    }
+
+    @keyframes potMiniVortex {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes potMiniSpiral {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes potMiniSpiralRev {
+      to { transform: rotate(-360deg); }
+    }
+
+    @keyframes potMiniRing {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes potMiniRingRev {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(-360deg); }
+    }
+
+    .pot-spin-btn:hover .pot-spin-vortex {
+      animation-duration: 0.45s;
+    }
+
+    .pot-spin-btn:hover .pot-spin-spiral-1 {
+      animation-duration: 0.95s;
+    }
+
+    .pot-spin-btn:hover .pot-spin-spiral-2 {
+      animation-duration: 1.25s;
+    }
+
+    .pot-spin-btn:hover .pot-spin-r1 {
+      animation-duration: 1s;
+    }
+
+    .pot-spin-btn:hover .pot-spin-r2 {
+      animation-duration: 1.4s;
+    }
+
+    .pot-spin-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    .pot-spin-btn:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+
+    .pot-spin-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .big-win-celebration {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      padding: 0.15rem 0.3rem 0;
+      pointer-events: none;
+      background: linear-gradient(
+        to top,
+        rgba(8, 4, 18, 0.94) 0%,
+        rgba(8, 4, 18, 0.72) 42%,
+        rgba(8, 4, 18, 0.2) 78%,
+        transparent 100%
+      );
+    }
+
+    .stage.show-big-win .big-win-celebration {
+      display: flex;
+    }
+
+    .reel-window.swirl-active .big-win-celebration {
+      display: none !important;
+    }
+
+    .big-win-stack {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      min-height: clamp(2.4rem, 10dvh, 3.75rem);
+    }
+
+    .big-win-dust {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 8px;
+      height: 8px;
+      translate: -50% 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .big-win-particle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: var(--sz, 4px);
+      height: var(--sz, 4px);
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 35% 35%,
+        var(--c0, #fffef5) 0%,
+        var(--c1, #ffe566) 48%,
+        var(--c2, #c9a227) 100%
+      );
+      box-shadow:
+        0 0 calc(var(--sz, 4px) * 2) var(--glow, rgba(255, 246, 200, 0.95)),
+        0 0 calc(var(--sz, 4px) * 3.5) var(--glow2, rgba(232, 197, 71, 0.55));
+      transform-origin: 50% 100%;
+      animation: volcanoDust var(--dur, 1.1s) ease-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes volcanoDust {
+      0% {
+        transform: rotate(var(--rot, -75deg)) translateX(0) translateY(0) scale(1);
+        opacity: 0;
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        transform:
+          rotate(var(--rot, -75deg)) translateX(var(--drift, 0px)) translateY(var(--lift, -88px)) scale(0.15);
+        opacity: 0;
+      }
+    }
+
+    .big-win-label {
+      position: relative;
+      z-index: 3;
+      margin: 0;
+      padding: 0;
+      font-size: clamp(1.55rem, 7vw, 3.52rem);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      line-height: 1.05;
+      text-align: center;
+      color: #fffcef;
+      text-shadow:
+        0 0 32px #fff5c8,
+        0 0 64px #e8c547,
+        0 0 112px rgba(232, 197, 71, 0.9),
+        0 4px 12px rgba(0, 0, 0, 0.9);
+      animation: bigWinFlash 0.42s ease-in-out infinite alternate;
+    }
+
+    @keyframes bigWinFlash {
+      from {
+        opacity: 0.82;
+        filter: brightness(1);
+        transform: scale(1);
+      }
+      to {
+        opacity: 1;
+        filter: brightness(1.45);
+        transform: scale(1.06);
+      }
+    }
+
+    .slot-strip {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Heavy dim during transitions — slot art barely readable under the spell */
+    .reel-dim-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          ellipse 95% 90% at 50% 45%,
+          rgba(0, 0, 0, 0.72) 0%,
+          rgba(2, 0, 8, 0.94) 45%,
+          rgba(0, 0, 0, 0.97) 100%
+        ),
+        rgba(4, 2, 12, 0.92);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .reel-window.is-spinning .reel-dim-overlay,
+    .reel-window.swirl-active .reel-dim-overlay {
+      opacity: 1;
+    }
+
+    .slot-frame {
+      position: relative;
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Letterboxing from object-fit:contain; isolation keeps ::after above transformed img */
+    .slot-frame[data-index="0"],
+    .slot-frame[data-index="1"] {
+      isolation: isolate;
+      background: linear-gradient(
+        180deg,
+        var(--bg-deep) 0%,
+        #0a0514 45%,
+        #12081f 100%
+      );
+    }
+
+    .slot-frame[data-index="0"] img,
+    .slot-frame[data-index="1"] img {
+      background-color: #0a0514;
+      position: relative;
+      z-index: 0;
+    }
+
+    /* Masks solid white strip baked into the first two PNGs (bottom of asset) */
+
+    .slot-frame[data-index="0"]::after,
+    .slot-frame[data-index="1"]::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: clamp(52px, 20%, 96px);
+      z-index: 2;
+      pointer-events: none;
+      /* Mostly opaque fill — previous gradient was too transparent, white still read through */
+      background: linear-gradient(
+        to top,
+        #0a0514 0%,
+        #0a0514 55%,
+        #10081c 78%,
+        rgba(10, 5, 20, 0) 100%
+      );
+    }
+
+    .reel-window.swirl-active .slot-frame[data-index="0"]::after,
+    .reel-window.swirl-active .slot-frame[data-index="1"]::after,
+    .reel-window.is-spinning .slot-frame[data-index="0"]::after,
+    .reel-window.is-spinning .slot-frame[data-index="1"]::after {
+      opacity: 0;
+    }
+
+    .slot-frame img,
+    .slot-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      transform: translateZ(0);
+    }
+
+    .slot-frame video {
+      background: #0a0514;
+    }
+
+    /* Slightly lift the parchment / title on the opening slot art */
+    .slot-frame:first-child img {
+      filter: brightness(1.09) contrast(1.04) saturate(1.06);
+    }
+
+    /* Final slide: anchor to top of art so wizard hats stay in frame */
+    .slot-frame[data-index="2"] img {
+      object-position: center top;
+    }
+
+    /* Crush visibility under swirl (static while swirl-active after spin blur ends) */
+    .reel-window.swirl-active .slot-frame img,
+    .reel-window.swirl-active .slot-frame video {
+      filter: brightness(0.1) blur(14px) saturate(0.65);
+    }
+
+    .reel-window.swirl-active .slot-frame[data-index="2"] img {
+      object-position: center top;
+    }
+
+    /* Spin blur during transition — stays very dark + extra blur */
+    .reel-window.is-spinning .slot-frame img,
+    .reel-window.is-spinning .slot-frame video {
+      animation: reelBlur 0.45s ease-in-out infinite alternate;
+    }
+
+    @keyframes reelBlur {
+      from {
+        filter: blur(4px) brightness(0.12) saturate(0.7);
+        transform: translateZ(0) scale(1);
+      }
+      to {
+        filter: blur(14px) brightness(0.2) saturate(0.75);
+        transform: translateZ(0) scale(1.03);
+      }
+    }
+
+    /*
+      Mobile: ~30% uniform zoom so art fills the reel (edges clip; aspect ratio kept).
+      Does not “stretch” wide/tall separately — no cartoon distortion.
+      Slight softness is normal when upscaling raster PNGs (same as zooming a photo).
+    */
+    @media (max-width: 640px) {
+      .reel-stack {
+        width: min(96vw, 440px);
+      }
+
+      .reel-window {
+        max-height: min(78dvh, 78svh, 600px);
+      }
+
+      .reel-chrome {
+        padding-bottom: clamp(0.5rem, 4vw, 0.95rem);
+      }
+
+      .slot-frame img,
+      .slot-frame video {
+        transform: translateZ(0) scale(1.3);
+      }
+
+      .slot-frame[data-index="2"] img {
+        transform: translateZ(0) scale(1.14);
+        object-position: center top;
+      }
+
+      .reel-window.swirl-active .slot-frame img,
+      .reel-window.swirl-active .slot-frame video {
+        transform: translateZ(0) scale(1.3);
+        filter: brightness(0.1) blur(14px) saturate(0.65);
+      }
+
+      .reel-window.swirl-active .slot-frame[data-index="2"] img {
+        transform: translateZ(0) scale(1.14);
+        object-position: center top;
+      }
+
+      .reel-window.is-spinning .slot-frame img,
+      .reel-window.is-spinning .slot-frame video {
+        animation: reelBlurMobile 0.45s ease-in-out infinite alternate;
+      }
+
+      .reel-window.is-spinning .slot-frame[data-index="2"] img {
+        animation: reelBlurMobileJackpot 0.45s ease-in-out infinite alternate;
+      }
+
+      @keyframes reelBlurMobile {
+        from {
+          filter: blur(4px) brightness(0.12) saturate(0.7);
+          transform: translateZ(0) scale(1.3);
+        }
+        to {
+          filter: blur(14px) brightness(0.2) saturate(0.75);
+          transform: translateZ(0) scale(1.339);
+        }
+      }
+
+      @keyframes reelBlurMobileJackpot {
+        from {
+          filter: blur(4px) brightness(0.12) saturate(0.7);
+          transform: translateZ(0) scale(1.14);
+        }
+        to {
+          filter: blur(14px) brightness(0.2) saturate(0.75);
+          transform: translateZ(0) scale(1.175);
+        }
+      }
+
+      .big-win-label {
+        font-size: clamp(1.2rem, 6.2vw, 2.35rem);
+      }
+
+      .big-win-stack {
+        min-height: clamp(2rem, 9dvh, 3.25rem);
+      }
+
+      .slot-hud {
+        padding-left: 0.5%;
+        padding-right: 0.5%;
+      }
+    }
+
+    /* Magical swirl overlay */
+    .swirl-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reel-window.swirl-active .swirl-layer {
+      opacity: 1;
+    }
+
+    .swirl-vortex {
+      position: absolute;
+      z-index: 0;
+      width: 140%;
+      height: 140%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(92, 225, 255, 0.15) 40deg,
+          transparent 80deg,
+          rgba(196, 76, 255, 0.2) 120deg,
+          transparent 160deg,
+          rgba(232, 197, 71, 0.18) 200deg,
+          transparent 240deg,
+          rgba(196, 76, 255, 0.12) 280deg,
+          transparent 320deg,
+          rgba(92, 225, 255, 0.1) 360deg
+        );
+      animation: vortexSpin 1.2s linear infinite;
+    }
+
+    .reel-window.swirl-active .swirl-vortex {
+      animation: vortexSpin 0.35s linear infinite;
+    }
+
+    @keyframes vortexSpin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Fine spiral threads (slot “reel” energy) */
+    .spiral-disk {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 135%;
+      height: 135%;
+      z-index: 1;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: repeating-conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0deg 11deg,
+        rgba(232, 197, 71, 0.14) 11deg 12deg,
+        transparent 12deg 23deg,
+        rgba(92, 225, 255, 0.1) 23deg 24deg,
+        transparent 24deg 35deg,
+        rgba(196, 76, 255, 0.12) 35deg 36deg
+      );
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 18%, black 42%, transparent 78%);
+      mask-image: radial-gradient(circle at 50% 50%, transparent 18%, black 42%, transparent 78%);
+      animation: spiralSpin 2.2s linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes spiralSpin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes spiralSpinRev {
+      to { transform: translate(-50%, -50%) rotate(-360deg); }
+    }
+
+    .spiral-disk.s2 {
+      width: 115%;
+      height: 115%;
+      animation: spiralSpinRev 3.4s linear infinite;
+      opacity: 0;
+      background: repeating-conic-gradient(
+        from 45deg at 50% 50%,
+        transparent 0deg 9deg,
+        rgba(196, 76, 255, 0.11) 9deg 10deg,
+        transparent 10deg 22deg,
+        rgba(232, 197, 71, 0.09) 22deg 23deg
+      );
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 28%, black 58%, transparent 88%);
+      mask-image: radial-gradient(circle at 50% 50%, transparent 28%, black 58%, transparent 88%);
+    }
+
+    .reel-window.swirl-active .spiral-disk {
+      opacity: 0.9;
+    }
+
+    .reel-window.swirl-active .spiral-disk.s2 {
+      opacity: 0.65;
+    }
+
+    /* Mystical spell-mist */
+    .mist-bank {
+      position: absolute;
+      inset: -25%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .reel-window.swirl-active .mist-bank {
+      opacity: 1;
+    }
+
+    .mist {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(38px);
+      mix-blend-mode: screen;
+      will-change: transform, opacity;
+    }
+
+    .mist-a {
+      width: 70%;
+      height: 65%;
+      left: -5%;
+      top: 15%;
+      background: radial-gradient(ellipse 100% 100%, rgba(196, 76, 255, 0.55) 0%, rgba(92, 225, 255, 0.15) 45%, transparent 70%);
+      animation: mistDriftA 2.8s ease-in-out infinite;
+    }
+
+    .mist-b {
+      width: 65%;
+      height: 70%;
+      right: -8%;
+      top: 25%;
+      background: radial-gradient(ellipse 100% 100%, rgba(92, 225, 255, 0.4) 0%, rgba(232, 197, 71, 0.12) 50%, transparent 68%);
+      animation: mistDriftB 3.2s ease-in-out infinite;
+    }
+
+    .mist-c {
+      width: 85%;
+      height: 50%;
+      left: 8%;
+      bottom: -5%;
+      background: radial-gradient(ellipse 100% 100%, rgba(74, 45, 122, 0.65) 0%, rgba(196, 76, 255, 0.2) 55%, transparent 72%);
+      animation: mistDriftC 2.5s ease-in-out infinite;
+    }
+
+    .mist-d {
+      width: 55%;
+      height: 55%;
+      left: 50%;
+      top: 50%;
+      translate: -50% -50%;
+      background: radial-gradient(circle, rgba(245, 240, 255, 0.2) 0%, rgba(92, 225, 255, 0.08) 40%, transparent 65%);
+      filter: blur(28px);
+      animation: mistPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes mistDriftA {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.75; }
+      50% { transform: translate(8%, -6%) scale(1.08); opacity: 1; }
+    }
+
+    @keyframes mistDriftB {
+      0%, 100% { transform: translate(0, 0) scale(1.05); opacity: 0.65; }
+      50% { transform: translate(-10%, 5%) scale(1); opacity: 0.95; }
+    }
+
+    @keyframes mistDriftC {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
+      50% { transform: translate(4%, -8%) rotate(6deg); opacity: 1; }
+    }
+
+    @keyframes mistPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.9; }
+    }
+
+    .swirl-ring {
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--gold);
+      border-right-color: rgba(92, 225, 255, 0.6);
+      border-bottom-color: rgba(196, 76, 255, 0.5);
+      border-left-color: rgba(232, 197, 71, 0.3);
+      box-shadow:
+        0 0 20px rgba(196, 76, 255, 0.4),
+        inset 0 0 20px rgba(92, 225, 255, 0.15);
+    }
+
+    .swirl-ring.r1 {
+      width: 55%;
+      height: 55%;
+      max-width: 220px;
+      max-height: 220px;
+      transform: translate(-50%, -50%);
+      animation: ringSpin 2s linear infinite;
+    }
+
+    .swirl-ring.r2 {
+      width: 72%;
+      height: 72%;
+      max-width: 290px;
+      max-height: 290px;
+      transform: translate(-50%, -50%);
+      animation: ringSpinReverse 2.6s linear infinite;
+      opacity: 0.85;
+    }
+
+    .swirl-ring.r3 {
+      width: 88%;
+      height: 88%;
+      max-width: 360px;
+      max-height: 360px;
+      transform: translate(-50%, -50%);
+      animation: ringSpin 3.2s linear infinite;
+      opacity: 0.6;
+    }
+
+    .swirl-ring.r4 {
+      width: 100%;
+      height: 100%;
+      max-width: 400px;
+      max-height: 400px;
+      transform: translate(-50%, -50%);
+      animation: ringSpinReverse 4s linear infinite;
+      opacity: 0.35;
+      border-width: 1px;
+      box-shadow:
+        0 0 28px rgba(92, 225, 255, 0.25),
+        inset 0 0 24px rgba(196, 76, 255, 0.12);
+    }
+
+    @keyframes ringSpin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes ringSpinReverse {
+      to { transform: translate(-50%, -50%) rotate(-360deg); }
+    }
+
+    /* Opaque veil with a growing “portal” hole (center reveals next reel) */
+    .swirl-mask {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 100% 100% at 50% 45%, #4a2d7a 0%, var(--bg-mid) 52%, #080410 100%);
+      opacity: 0;
+    }
+
+    .reel-window.swirl-active .swirl-mask {
+      opacity: 1;
+      animation: veilReveal var(--swirl-duration) cubic-bezier(0.2, 0.85, 0.25, 1) forwards;
+    }
+
+    @keyframes veilReveal {
+      0% {
+        mask-image: radial-gradient(circle at 50% 50%, transparent 0%, black 0.35%);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0%, black 0.35%);
+      }
+      18% {
+        mask-image: radial-gradient(circle at 50% 50%, transparent 4%, black 8%);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 4%, black 8%);
+      }
+      100% {
+        mask-image: radial-gradient(circle at 50% 50%, transparent 75%, black 76%);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 75%, black 76%);
+        opacity: 0;
+      }
+    }
+
+    .sparkles {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      opacity: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1.5px 1.5px at 75% 20%, rgba(232,197,71,0.9), transparent),
+        radial-gradient(2px 2px at 50% 80%, rgba(92,225,255,0.8), transparent),
+        radial-gradient(1px 1px at 85% 65%, rgba(196,76,255,0.9), transparent),
+        radial-gradient(1.5px 1.5px at 10% 70%, rgba(255,255,255,0.7), transparent);
+      background-size: 100% 100%;
+      animation: sparkleTwinkle 0.8s ease-in-out infinite;
+    }
+
+    .reel-window.swirl-active .sparkles {
+      opacity: 0.7;
+    }
+
+    @keyframes sparkleTwinkle {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.02); }
+    }
+
+    .reel-stack:has(.reel-window.is-transitioning) .pot-spin-btn {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    @media (min-width: 641px) {
+      /*
+        Header + HUD sit outside the reel; 94dvh on the reel alone overflows the viewport
+        when centered. Cap reel height and align from the top so nothing clips.
+      */
+      .stage {
+        justify-content: flex-start;
+        padding-top: max(0.65rem, env(safe-area-inset-top, 0px));
+        padding-bottom: max(1.1rem, calc(0.5rem + env(safe-area-inset-bottom, 0px)));
+      }
+
+      .reel-window {
+        max-height: min(
+          calc(100dvh - 15rem),
+          calc(100svh - 15rem),
+          62dvh,
+          62svh,
+          600px
+        );
+      }
+
+      .stage.show-big-win .reel-window {
+        max-height: min(
+          calc(100dvh - 17.5rem),
+          calc(100svh - 17.5rem),
+          58dvh,
+          58svh,
+          560px
+        );
+      }
+
+      .reel-stack {
+        width: min(85vw, 440px);
+      }
+
+      .reel-header {
+        padding-top: clamp(1.35rem, 6.5%, 2.1rem);
+      }
+
+      .stage.show-big-win .reel-header {
+        padding-top: clamp(0.25rem, 1.2vw, 0.5rem);
+        padding-bottom: clamp(0.4rem, 1.8vw, 0.65rem);
+      }
+
+      .stage.show-big-win .reel-header .title-stack {
+        transform: none;
+      }
+
+      .reel-chrome {
+        padding-left: 0.65rem;
+        padding-right: 0.65rem;
+        padding-bottom: clamp(0.65rem, 5%, 1.15rem);
+      }
+    }
+
+    @media (max-height: 560px) {
+      .reel-window {
+        max-height: min(52dvh, 52svh, 440px);
+      }
+
+      .stage {
+        gap: 0.45rem;
+        justify-content: flex-start;
+        padding-top: 0.5rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root {
+        --swirl-duration: 0.85s;
+        --hold-duration: 1.4s;
+      }
+      .reel-dim-overlay {
+        transition-duration: 0.12s;
+      }
+      .reel-window.is-spinning .slot-frame img,
+      .reel-window.is-spinning .slot-frame video {
+        animation: none;
+      }
+      .swirl-vortex,
+      .swirl-ring,
+      .spiral-disk {
+        animation-duration: 4s !important;
+      }
+      .spiral-disk.s2 {
+        animation-duration: 5s !important;
+      }
+      .mist {
+        animation: none !important;
+        opacity: 0.6 !important;
+      }
+      .game-heading {
+        text-shadow:
+          0 0 6px rgba(92, 225, 255, 0.85),
+          0 0 16px rgba(92, 225, 255, 0.45);
+        filter: none;
+      }
+      .game-tagline {
+        animation: none;
+        text-shadow:
+          0 0 6px rgba(196, 76, 255, 0.75),
+          0 0 14px rgba(196, 76, 255, 0.4);
+        filter: none;
+      }
+      .title-ampersand {
+        text-shadow: 0 0 12px rgba(196, 76, 255, 0.65);
+        filter: none;
+      }
+      .big-win-label {
+        animation: none;
+        filter: none;
+      }
+      .big-win-particle {
+        animation: none;
+        opacity: 0;
+      }
+      .pot-spin-btn .pot-spin-vortex,
+      .pot-spin-btn .pot-spin-spiral-1,
+      .pot-spin-btn .pot-spin-spiral-2,
+      .pot-spin-btn .pot-spin-r1,
+      .pot-spin-btn .pot-spin-r2 {
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+    <div class="reel-stack">
+      <header class="reel-header">
+        <div class="title-stack">
+          <h1 class="game-heading">If I had just 1 wish</h1>
+          <span class="title-ampersand" aria-hidden="true">&</span>
+          <p class="game-tagline">If you were a wizard</p>
+        </div>
+      </header>
+      <div class="reel-window" id="reel" data-slide="0">
+      <div class="slot-strip" id="strip" style="transform: translateY(0%); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);">
+        <div class="slot-frame" data-index="0">
+          <img src="src/Wish Grant Slot.png" alt="Wish Grant Slot" width="800" height="1067" decoding="async" />
+        </div>
+        <div class="slot-frame" data-index="1">
+          <img src="src/genie_image.png" alt="Genie" width="800" height="1067" decoding="async" />
+        </div>
+        <div class="slot-frame" data-index="2">
+          <img
+            src="src/wizards_collaboration_insert_use.jpg"
+            alt="Wizard collaboration"
+            width="800"
+            height="1067"
+            decoding="async"
+          />
+        </div>
+      </div>
+      <div class="reel-dim-overlay" aria-hidden="true"></div>
+      <div class="swirl-mask" id="swirlMask" aria-hidden="true"></div>
+      <div class="swirl-layer" aria-hidden="true">
+        <div class="swirl-vortex"></div>
+        <div class="spiral-disk s1"></div>
+        <div class="spiral-disk s2"></div>
+        <div class="mist-bank">
+          <div class="mist mist-a"></div>
+          <div class="mist mist-b"></div>
+          <div class="mist mist-c"></div>
+          <div class="mist mist-d"></div>
+        </div>
+        <div class="swirl-ring r1"></div>
+        <div class="swirl-ring r2"></div>
+        <div class="swirl-ring r3"></div>
+        <div class="swirl-ring r4"></div>
+        <div class="sparkles"></div>
+      </div>
+      <div class="reel-chrome">
+        <div class="big-win-celebration" id="bigWinFx" aria-hidden="true">
+          <div class="big-win-stack">
+            <p class="big-win-label">BIG WIN</p>
+            <div class="big-win-dust" id="bigWinDust"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="slot-hud slot-hud-below" id="slotHud" aria-hidden="false">
+      <div class="hud-left">
+        <div class="hud-readout hud-balance">
+          <span class="hud-label">Balance</span>
+          <span class="hud-value" id="hudBalance">5,000</span>
+        </div>
+        <div class="hud-readout hud-bet">
+          <span class="hud-label">Bet</span>
+          <span class="hud-value" id="hudBet">100</span>
+        </div>
+      </div>
+      <div class="hud-center">
+        <div class="hud-readout hud-winnings" id="hudWinningsWrap">
+          <span class="hud-label">Winnings</span>
+          <span class="hud-value" id="hudWinnings">0</span>
+        </div>
+      </div>
+      <div class="hud-spin-wrap">
+        <span class="hud-replay-hint">Replay</span>
+        <button type="button" class="pot-spin-btn" id="tapAdvance" aria-label="Spin — advance to next slide">
+          <span class="pot-spin-mini" aria-hidden="true">
+            <span class="pot-spin-vortex"></span>
+            <span class="pot-spin-spiral pot-spin-spiral-1"></span>
+            <span class="pot-spin-spiral pot-spin-spiral-2"></span>
+            <span class="pot-spin-ring pot-spin-r1"></span>
+            <span class="pot-spin-ring pot-spin-r2"></span>
+          </span>
+        </button>
+      </div>
+      </div>
+    </div>
+  </main>
+  <audio id="slotWinSfx" preload="auto" src="slot-win.wav"></audio>
+  <script>
+    (function () {
+      const reel = document.getElementById("reel");
+      const strip = document.getElementById("strip");
+      const mask = document.getElementById("swirlMask");
+      const tapBtn = document.getElementById("tapAdvance");
+      const stage = document.getElementById("stage");
+      const slotWinSfx = document.getElementById("slotWinSfx");
+      const hudBalanceEl = document.getElementById("hudBalance");
+      const hudBetEl = document.getElementById("hudBet");
+      const hudWinningsEl = document.getElementById("hudWinnings");
+      const hudWinningsWrap = document.getElementById("hudWinningsWrap");
+
+      var START_BALANCE = 5000;
+      var BET_AMOUNT = 100;
+      var JACKPOT_WIN = 10000;
+
+      let index = 0;
+      let running = false;
+      let timers = [];
+      let busy = false;
+      var jackpotRaf = null;
+
+      function formatMoney(n) {
+        return Number(n).toLocaleString("en-US");
+      }
+
+      function cancelJackpotAnim() {
+        if (jackpotRaf != null) {
+          cancelAnimationFrame(jackpotRaf);
+          jackpotRaf = null;
+        }
+        if (hudWinningsWrap) hudWinningsWrap.classList.remove("is-counting");
+      }
+
+      function applyHud(balance, winnings) {
+        if (hudBalanceEl) hudBalanceEl.textContent = formatMoney(balance);
+        if (hudBetEl) hudBetEl.textContent = formatMoney(BET_AMOUNT);
+        if (hudWinningsEl) hudWinningsEl.textContent = formatMoney(winnings);
+      }
+
+      function startJackpotCountUp() {
+        cancelJackpotAnim();
+        if (!hudWinningsEl || !hudBalanceEl || !hudWinningsWrap) return;
+        hudWinningsWrap.classList.add("is-counting");
+        hudBalanceEl.textContent = formatMoney(START_BALANCE);
+        hudWinningsEl.textContent = formatMoney(0);
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          hudWinningsEl.textContent = formatMoney(JACKPOT_WIN);
+          hudBalanceEl.textContent = formatMoney(START_BALANCE + JACKPOT_WIN);
+          hudWinningsWrap.classList.remove("is-counting");
+          return;
+        }
+
+        var t0 = performance.now();
+        var dur = 2200;
+        function tick(now) {
+          var t = Math.min(1, (now - t0) / dur);
+          var eased = 1 - Math.pow(1 - t, 3);
+          var v = Math.round(JACKPOT_WIN * eased);
+          hudWinningsEl.textContent = formatMoney(v);
+          if (t < 1) {
+            jackpotRaf = requestAnimationFrame(tick);
+          } else {
+            hudWinningsEl.textContent = formatMoney(JACKPOT_WIN);
+            hudBalanceEl.textContent = formatMoney(START_BALANCE + JACKPOT_WIN);
+            hudWinningsWrap.classList.remove("is-counting");
+            jackpotRaf = null;
+          }
+        }
+        jackpotRaf = requestAnimationFrame(tick);
+      }
+
+      function clearTimers() {
+        timers.forEach(clearTimeout);
+        timers = [];
+      }
+
+      function holdMs() {
+        return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hold-duration")) * 1000 || 2800;
+      }
+
+      function setStripPosition(i) {
+        strip.style.transform = "translateY(" + -i * 100 + "%)";
+      }
+
+      var jackpotTaglineToken = 0;
+
+      function syncJackpotTaglineAfterImage() {
+        var tagline = document.querySelector(".game-tagline");
+        if (index !== 2) {
+          jackpotTaglineToken++;
+          reel.classList.remove("jackpot-art-ready");
+          if (tagline) tagline.setAttribute("aria-hidden", "true");
+          return;
+        }
+
+        jackpotTaglineToken++;
+        var token = jackpotTaglineToken;
+        reel.classList.remove("jackpot-art-ready");
+        if (tagline) tagline.setAttribute("aria-hidden", "true");
+
+        var img = strip.querySelector('.slot-frame[data-index="2"] img');
+        function reveal() {
+          if (token !== jackpotTaglineToken || index !== 2) return;
+          reel.classList.add("jackpot-art-ready");
+          if (tagline) tagline.removeAttribute("aria-hidden");
+        }
+
+        if (!img) {
+          reveal();
+          return;
+        }
+
+        if (typeof img.decode === "function") {
+          img.decode().then(reveal).catch(reveal);
+          return;
+        }
+
+        if (img.complete && img.naturalWidth > 0) {
+          reveal();
+        } else {
+          img.addEventListener("load", reveal, { once: true });
+          img.addEventListener("error", reveal, { once: true });
+        }
+      }
+
+      function syncBigWinClass() {
+        stage.classList.toggle("show-big-win", index === 2);
+        document.getElementById("bigWinFx").setAttribute("aria-hidden", index === 2 ? "false" : "true");
+        reel.dataset.slide = String(index);
+        if (index !== 2) stopSlotWinSound();
+        syncJackpotTaglineAfterImage();
+      }
+
+      var reelSpinCtx = null;
+      function ensureReelSpinCtx() {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        if (!reelSpinCtx) reelSpinCtx = new AC();
+        return reelSpinCtx;
+      }
+
+      /**
+       * In-browser reel spin. Only schedules audio when AudioContext is running
+       * (after a user gesture — see primeReelAudio). Otherwise skips silently to
+       * avoid autopolicy console errors and invalid negative schedule times.
+       */
+      function playReelSpinSound(durationMs) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var ctx = ensureReelSpinCtx();
+        if (!ctx) return;
+        if (ctx.state !== "running") {
+          ctx.resume().catch(function () {});
+          return;
+        }
+
+        var dur = Math.max(0.05, durationMs / 1000);
+        var t0 = Math.max(0, ctx.currentTime);
+        var t1 = t0 + dur;
+
+        var master = ctx.createGain();
+        master.gain.setValueAtTime(0, t0);
+        master.gain.linearRampToValueAtTime(0.38, t0 + 0.05);
+        master.gain.setValueAtTime(0.34, Math.max(t0 + 0.06, t1 - 0.18));
+        master.gain.linearRampToValueAtTime(0, t1 + 0.06);
+
+        var loudOut = ctx.createGain();
+        loudOut.gain.value = 2.35;
+        var comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -16;
+        comp.knee.value = 18;
+        comp.ratio.value = 3.5;
+        comp.attack.value = 0.002;
+        comp.release.value = 0.08;
+        master.connect(loudOut);
+        loudOut.connect(comp);
+        comp.connect(ctx.destination);
+
+        var len = Math.floor(Math.max(ctx.sampleRate * 0.25, 6000));
+        var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+        var ch = buf.getChannelData(0);
+        var last = 0;
+        var i;
+        for (i = 0; i < len; i++) {
+          var w = Math.random() * 2 - 1;
+          last = (last + 0.025 * w) * 0.97;
+          ch[i] = last * 0.88;
+        }
+        var srcN = ctx.createBufferSource();
+        srcN.buffer = buf;
+        srcN.loop = true;
+        var bp = ctx.createBiquadFilter();
+        bp.type = "bandpass";
+        bp.Q.value = 4;
+        bp.frequency.setValueAtTime(380, t0);
+        bp.frequency.exponentialRampToValueAtTime(1100, t0 + dur * 0.45);
+        bp.frequency.exponentialRampToValueAtTime(320, t1);
+        var gN = ctx.createGain();
+        gN.gain.value = 0.95;
+        srcN.connect(bp);
+        bp.connect(gN);
+        gN.connect(master);
+        srcN.start(t0);
+        srcN.stop(t1 + 0.06);
+
+        var period = 0.046;
+        var n = Math.min(120, Math.floor(dur / period));
+        for (i = 0; i < n; i++) {
+          (function (ct, fk) {
+            if (!isFinite(ct) || ct < t0) ct = t0;
+            var click = ctx.createOscillator();
+            click.type = "square";
+            click.frequency.value = 88 + (fk % 9) * 11;
+            var lp = ctx.createBiquadFilter();
+            lp.type = "lowpass";
+            lp.frequency.value = 380;
+            var gC = ctx.createGain();
+            gC.gain.setValueAtTime(0, ct);
+            gC.gain.linearRampToValueAtTime(0.095, ct + 0.002);
+            gC.gain.exponentialRampToValueAtTime(0.0008, ct + 0.036);
+            click.connect(lp);
+            lp.connect(gC);
+            gC.connect(master);
+            click.start(ct);
+            click.stop(ct + 0.042);
+          })(t0 + i * period + (Math.random() * 0.01 - 0.005), i);
+        }
+
+        for (i = 0; i < Math.floor(n / 3); i++) {
+          (function (ht) {
+            if (!isFinite(ht) || ht < t0) ht = t0;
+            var o = ctx.createOscillator();
+            o.type = "triangle";
+            o.frequency.value = 1650 + Math.random() * 500;
+            var go = ctx.createGain();
+            go.gain.setValueAtTime(0, ht);
+            go.gain.linearRampToValueAtTime(0.048, ht + 0.002);
+            go.gain.exponentialRampToValueAtTime(0.0008, ht + 0.055);
+            o.connect(go);
+            go.connect(master);
+            o.start(ht);
+            o.stop(ht + 0.065);
+          })(t0 + i * period * 3 + Math.random() * 0.025);
+        }
+      }
+
+      function stopSlotWinSound() {
+        slotWinSfx.pause();
+        slotWinSfx.currentTime = 0;
+      }
+
+      function playSlotWinSound() {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        stopSlotWinSound();
+        slotWinSfx.volume = 1;
+        var playP = slotWinSfx.play();
+        if (playP && playP.catch) playP.catch(function () {});
+      }
+
+      function primeReelAudio() {
+        var c = ensureReelSpinCtx();
+        if (c) c.resume().catch(function () {});
+        slotWinSfx.load();
+      }
+      tapBtn.addEventListener("pointerdown", primeReelAudio, { once: true });
+      reel.addEventListener("pointerdown", primeReelAudio, { once: true });
+
+      function runSwirlThenAdvance(nextIndex, onDone) {
+        if (busy) return;
+        if (index === 2) {
+          stopSlotWinSound();
+        }
+        busy = true;
+        reel.classList.add("is-spinning", "swirl-active", "is-transitioning");
+        mask.style.animation = "none";
+        void mask.offsetWidth;
+        mask.style.animation = "";
+
+        window.setTimeout(function () {
+          reel.classList.remove("is-spinning");
+        }, 500);
+
+        var swirlMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--swirl-duration")) * 1000 || 2400;
+        playReelSpinSound(swirlMs);
+
+        window.setTimeout(function () {
+          index = nextIndex;
+          setStripPosition(index);
+          syncBigWinClass();
+          cancelJackpotAnim();
+          applyHud(START_BALANCE, 0);
+        }, Math.round(swirlMs * 0.55));
+
+        window.setTimeout(function () {
+          reel.classList.remove("swirl-active", "is-transitioning");
+          mask.style.animation = "none";
+          syncBigWinClass();
+          busy = false;
+          if (index === 2) {
+            playSlotWinSound();
+            startJackpotCountUp();
+          }
+          if (onDone) onDone();
+        }, swirlMs);
+      }
+
+      /** Auto-advance: wait on current slide, then swirl to next until slide 3 (index 2). */
+      function kickAutoFromCurrent() {
+        clearTimers();
+        if (index >= 2) {
+          running = false;
+          return;
+        }
+        running = true;
+        timers.push(
+          window.setTimeout(function () {
+            runSwirlThenAdvance(index + 1, function () {
+              kickAutoFromCurrent();
+            });
+          }, holdMs())
+        );
+      }
+
+      function startExperience() {
+        clearTimers();
+        stopSlotWinSound();
+        cancelJackpotAnim();
+        applyHud(START_BALANCE, 0);
+        running = true;
+        busy = false;
+        index = 0;
+        setStripPosition(0);
+        reel.classList.remove("is-spinning", "swirl-active", "is-transitioning");
+        stage.classList.remove("show-big-win");
+        mask.style.animation = "none";
+        syncBigWinClass();
+        kickAutoFromCurrent();
+      }
+
+      function onTapAdvance() {
+        if (busy) return;
+        clearTimers();
+        running = true;
+        var next = (index + 1) % 3;
+        runSwirlThenAdvance(next, function () {
+          kickAutoFromCurrent();
+        });
+      }
+
+      tapBtn.addEventListener("click", onTapAdvance);
+
+      (function initBigWinDust() {
+        var dust = document.getElementById("bigWinDust");
+        if (!dust) return;
+        var palettes = [
+          { c0: "#fffef8", c1: "#ffe566", c2: "#a67c00", glow: "rgba(255, 248, 200, 0.95)", glow2: "rgba(232, 197, 71, 0.5)" },
+          { c0: "#f5f0ff", c1: "#c77dff", c2: "#6b2d9e", glow: "rgba(230, 200, 255, 0.9)", glow2: "rgba(196, 76, 255, 0.45)" },
+          { c0: "#e8fbff", c1: "#5ce1ff", c2: "#0878a6", glow: "rgba(170, 240, 255, 0.9)", glow2: "rgba(92, 225, 255, 0.45)" },
+          { c0: "#ffffff", c1: "#ffb8e8", c2: "#d81b9a", glow: "rgba(255, 220, 245, 0.85)", glow2: "rgba(255, 128, 200, 0.4)" },
+          { c0: "#fffde7", c1: "#ffee58", c2: "#f57f17", glow: "rgba(255, 241, 150, 0.9)", glow2: "rgba(255, 193, 7, 0.45)" },
+          { c0: "#f3e5f5", c1: "#ba68c8", c2: "#4a148c", glow: "rgba(225, 190, 255, 0.85)", glow2: "rgba(156, 39, 176, 0.4)" },
+          { c0: "#e8f5e9", c1: "#69f0ae", c2: "#00a86b", glow: "rgba(180, 255, 220, 0.75)", glow2: "rgba(0, 200, 140, 0.35)" },
+          { c0: "#fff8e1", c1: "#ffab40", c2: "#e65100", glow: "rgba(255, 210, 160, 0.85)", glow2: "rgba(255, 145, 80, 0.4)" }
+        ];
+        var n = 92;
+        var i;
+        var p;
+        var rot;
+        var pal;
+        var sz;
+        for (i = 0; i < n; i++) {
+          p = document.createElement("span");
+          p.className = "big-win-particle";
+          pal = palettes[Math.floor(Math.random() * palettes.length)];
+          p.style.setProperty("--c0", pal.c0);
+          p.style.setProperty("--c1", pal.c1);
+          p.style.setProperty("--c2", pal.c2);
+          p.style.setProperty("--glow", pal.glow);
+          p.style.setProperty("--glow2", pal.glow2);
+          rot = -52 - Math.random() * 58;
+          p.style.setProperty("--rot", rot + "deg");
+          p.style.setProperty("--drift", Math.random() * 56 - 28 + "px");
+          p.style.setProperty("--lift", -(38 + Math.random() * 52) + "px");
+          p.style.setProperty("--delay", Math.random() * 1.35 + "s");
+          p.style.setProperty("--dur", 0.85 + Math.random() * 0.75 + "s");
+          sz = 2 + Math.random() * 3.2;
+          p.style.setProperty("--sz", sz + "px");
+          dust.appendChild(p);
+        }
+      })();
+
+      startExperience();
+    })();
+  </script>
+</body>
+</html>
